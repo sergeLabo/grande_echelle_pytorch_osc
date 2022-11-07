@@ -1,0 +1,223 @@
+#:kivy 2.0.0
+
+<MainScreen>:
+    BoxLayout: # une boite pour tout
+        orientation: 'vertical'
+        canvas:
+            Color:
+                rgb: 1.2, 0, 1.2  # Fond blanc
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout: # une boite pour baisser le titre
+            orientation: 'vertical'
+            size_hint_y: 0.2
+        Label:  # Titre de l'application
+            size_hint_y: 0.3
+            text: root.titre
+            size_hint_y: 0.2
+            font_size: '64sp'
+            color: (0, 0, 0, 1)
+
+        BoxLayout: # Affichage de ce qui est envoyé en OSC
+            orientation: 'vertical'
+            size_hint_y: 0.4
+            BoxLayout:
+                orientation: 'vertical'
+                Label:  # Text depth
+                    text: 'Envoi en OSC de'
+                    font_size: '24sp'
+                    color: (1, 1, 1, 1)
+                Label:  # valeur depth
+                    text: str(root.depth)
+                    font_size: '36sp'
+                    color: (1, 1, 1, 1)
+                Label:  # ip port
+                    text: 'Adresse:  ' + root.ip + ' / ' + str(root.port)
+                    font_size: '24sp'
+                    color: (1, 1, 1, 1)
+
+        BoxLayout: # boutons en bas
+            orientation: 'horizontal'
+            size_hint_y: 0.3
+            Button:  # Réglages de profondeur
+                background_color: (0.7, 0.7, 0.7, 1)
+                text: 'Réglages de\n\ncapture'
+                color: (0, 1, 0, 1)
+                font_size: '22sp'
+                on_release: app.root.current = 'ReglageProfondeur'
+            Button:  # Réglages IP POrt
+                background_color: (0.7, 0.7, 0.7, 1)
+                text: 'Réglage:\nIP / Port\nNombre de frame\ndu film'
+                color: (0, 1, 0, 1)
+                font_size: '22sp'
+                on_release: app.open_settings()
+            Button:  # Quitter
+                background_color: (0.6, 0.6, 0.6, 1)
+                text: 'Quitter'
+                color: (0, 1, 0, 1)
+                font_size: '22sp'
+                on_release: app.do_quit()
+
+
+<ReglageProfondeur>:
+    BoxLayout: # une boite pour tout
+        orientation: 'vertical'
+
+        BoxLayout: # une boite pour espacer
+            orientation: 'horizontal'
+            size_hint_y: 0.05
+
+        BoxLayout: # une boite pour slider et switch
+            orientation: 'horizontal'
+            BoxLayout: # une boite pour switch
+                size_hint_x: 0.4
+                BoxLayout:
+                    orientation: 'vertical'
+                    BoxLayout: # espace
+                        size_hint_y: 0.75
+                    BoxLayout: # mode expo
+                        orientation: 'vertical'
+                        size_hint_y: 0.25
+                        Label:
+                            text: 'Mode Expo'
+                        Switch:
+                            id: mode_expo
+                            on_active: root.on_switch_mode_expo(*args)
+
+            BoxLayout: # une boite pour slider
+                orientation: 'vertical'
+
+                BoxLayout: # une boite texte et affichage threshold_pose
+                    orientation: 'horizontal'
+                    Label:  # threshold_pose
+                        text: 'Seuil de détection de la pose'
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                    Label:  # threshold_pose
+                        text: str(root.threshold_pose)
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                Slider: # threshold_pose
+                    id: threshold_pose
+                    orientation: 'horizontal'
+                    range: 0.01, 0.99
+                    step: 0.02
+                    value: root.threshold_pose
+                    value_position: root.threshold_pose
+                    on_value: root.do_slider('threshold_pose', *args)
+
+                BoxLayout: # une boite texte et affichage threshold_points
+                    orientation: 'horizontal'
+                    Label:  # threshold_points
+                        text: 'Seuil de détection des points'
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                    Label:  # threshold_points
+                        text: str(root.threshold_points)
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                Slider: # threshold_points
+                    id: threshold_points
+                    orientation: 'horizontal'
+                    range: 0.01, 0.99
+                    step: 0.02
+                    value: root.threshold_points
+                    value_position: root.threshold_points
+                    on_value: root.do_slider('threshold_points', *args)
+
+                BoxLayout: # une boite texte et affichage profondeur_mini
+                    orientation: 'horizontal'
+                    Label:  # profondeur_mini
+                        text: 'Profondeur mini'
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                    Label:
+                        text: str(root.profondeur_mini)
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                Slider:  # profondeur_mini
+                    id: profondeur_mini
+                    orientation: 'horizontal'
+                    range: 500, 2000
+                    step: 30
+                    value: root.profondeur_mini
+                    value_position: root.profondeur_mini
+                    on_value: root.do_slider('profondeur_mini', *args)
+
+                BoxLayout: # une boite texte et affichage profondeur_maxi
+                    orientation: 'horizontal'
+                    Label:  # profondeur_maxi
+                        text: 'Profondeur maxi'
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                    Label:
+                        text: str(root.profondeur_maxi)
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                Slider:  # profondeur_maxi
+                    id: profondeur_maxi
+                    orientation: 'horizontal'
+                    range: 3000, 8000
+                    step: 100
+                    value: root.profondeur_maxi
+                    value_position: root.profondeur_maxi
+                    on_value: root.do_slider('profondeur_maxi', *args)
+
+                BoxLayout: # une boite texte et affichage x maxi
+                    orientation: 'horizontal'
+                    Label:  # largeur_maxi
+                        text: 'Largeur maxi'
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                    Label:
+                        text: str(root.largeur_maxi)
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                Slider:  # largeur_maxi
+                    id: largeur_maxi
+                    orientation: 'horizontal'
+                    range: 100, 2000
+                    step: 40
+                    value: root.largeur_maxi
+                    value_position: root.largeur_maxi
+                    on_value: root.do_slider('largeur_maxi', *args)
+
+                BoxLayout: # une boite texte et affichage lissage
+                    orientation: 'horizontal'
+                    Label:  # lissage
+                        text: 'Coefficient de lissage'
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                    Label:
+                        text: str(root.lissage)
+                        font_size: '16sp'
+                        color: (0.5, 0.5, 0, 1)
+                Slider:  # pile sizelissage
+                    id: lissage
+                    orientation: 'horizontal'
+                    range: 1, 100
+                    step: 1
+                    value: root.lissage
+                    value_position: root.lissage
+                    on_value: root.do_slider('lissage', *args)
+
+        BoxLayout: # une boite pour espacer verticalemnt
+            orientation: 'horizontal'
+            size_hint_y: 0.05
+
+        BoxLayout: # une boite pour options retour quitter
+            orientation: 'horizontal'
+            size_hint_y: 0.10
+            Button:  # Retour
+                background_color: (0.7, 0.7, 0.7, 1)
+                text: 'Retour'
+                color: (0, 1, 0, 1)
+                font_size: '22sp'
+                on_release: app.root.current = 'Main'
+            Button:  # Quitter
+                background_color: (0.6, 0.6, 0.6, 1)
+                text: 'Quitter'
+                color: (0, 1, 0, 1)
+                font_size: '22sp'
+                on_release: app.do_quit()
