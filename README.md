@@ -57,6 +57,9 @@ python3 -m pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==
 python3 -m pip install -r requirements.txt
 ```
 
+Kivy 2.1 a un bug dans l'affichage des labels lors de la modification de valeur dans Options.
+Kivy 2.0 est ok !
+
 ### Délai pour éteindre le PC
 [Modification du délai pour éteindre](https://ressources.labomedia.org/la_grande_echelle#modification_du_delai_pour_eteindre_une_debian)
 
