@@ -3,6 +3,7 @@
 Interface graphique pour Grande Echelle OSC
 qui peut être lancé par run_grande_echelle.sh
 et le raccourci sur le bureau
+
 """
 
 
@@ -36,12 +37,11 @@ class MainScreen(Screen):
     root est le parent de cette classe dans la section <MainScreen> du kv
     """
 
-    # Attribut de class, obligatoire pour appeler root.titre dans kv
-    titre = StringProperty("Grande Echelle")
     # Pour affichage de ce qui est envoyé en OSC
     depth = NumericProperty(0)
     ip = StringProperty("127.0.0.1")
     port = NumericProperty(8000)
+    plage = NumericProperty(30000)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -79,14 +79,18 @@ class MainScreen(Screen):
             del self.osc
         self.osc = OSCClient(self.ip, self.port)
 
-    def osc_update(self):
-        self.ip = self.app.ip
-        self.port = self.app.port
-        print("Application des nouveaux IP/Port", self.ip, self.port)
-        self.osc_init()
+    def osc_update(self, ip, port):
+        # # print(dir(self.ids.adress_text.text))
+        # # print("tata", self.ids.adress_text.text)  # str = ""
 
-    def plage_update(self):
-        self.plage = self.app.plage
+        self.ip = ip
+        self.port = port
+        print("Screen Main: Application des nouveaux IP/Port", self.ip, self.port)
+        # # self.ids.adress_text.text = "toto"
+        # # self.osc_init()
+
+    def plage_update(self, plage):
+        self.plage = plage
         print("Application de la nouvelle plage", self.plage)
 
     def kivy_receive_thread(self):
@@ -177,6 +181,7 @@ class ReglageProfondeur(Screen):
     profondeur_maxi = NumericProperty(4000)
     largeur_maxi = NumericProperty(500)
     lissage = NumericProperty(11)
+    mode_expo = NumericProperty(0)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -197,6 +202,18 @@ class ReglageProfondeur(Screen):
         self.lissage = int(self.app.config.get('grandeechelle', 'lissage'))
         self.pile_size = self.lissage + 1
 
+    def on_switch_mode_expo(self, instance, value):
+        scr = self.app.screen_manager.get_screen('Main')
+        if value:
+            value = 1
+        else:
+            value = 0
+        self.mode_expo = value
+        if scr.p1_conn:
+            scr.p1_conn.send(['mode_expo', self.mode_expo])
+        self.app.config.set('grandeechelle', 'mode_expo', self.mode_expo)
+        self.app.config.write()
+        print("mode_expo =", self.mode_expo)
 
     def do_slider(self, iD, instance, value):
         """Méthode appelée si action sur un slider.
@@ -268,6 +285,10 @@ SCREENS = { 0: (MainScreen, 'Main'),
 
 
 class Grande_EchelleApp(App):
+
+    ip = StringProperty("127.0.0.1")
+    port = NumericProperty(8000)
+    plage = NumericProperty(30000)
 
     def build(self):
         """Exécuté après build_config, construit les écrans"""
@@ -362,7 +383,8 @@ class Grande_EchelleApp(App):
                 # Save in ini
                 self.config.set('osc', 'ip', self.ip)
                 scr = self.screen_manager.get_screen('Main')
-                scr.osc_update()
+                scr.osc_update(self.ip, self.port)
+
             # port
             if token == ('osc', 'port'):
                 self.port = int(value)
@@ -370,8 +392,9 @@ class Grande_EchelleApp(App):
                 # Save in ini
                 self.config.set('osc', 'port', self.port)
                 scr = self.screen_manager.get_screen('Main')
-                scr.osc_update()
-            # port
+                scr.osc_update(self.ip, self.port)
+
+            # plage
             if token == ('grandeechelle', 'plage'):
                 self.plage = int(value)
                 if self.plage < 0:
@@ -380,7 +403,7 @@ class Grande_EchelleApp(App):
                 # Save in ini
                 self.config.set('grandeechelle', 'plage', self.plage)
                 scr = self.screen_manager.get_screen('Main')
-                scr.plage_update()
+                scr.plage_update(self.plage)
 
     def go_mainscreen(self):
         """Retour au menu principal depuis les autres écrans."""

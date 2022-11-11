@@ -11,13 +11,15 @@
                 pos: self.pos
         BoxLayout: # une boite pour baisser le titre
             orientation: 'vertical'
-            size_hint_y: 0.2
+            size_hint_y: 0.1
         Label:  # Titre de l'application
             size_hint_y: 0.3
-            text: root.titre
-            size_hint_y: 0.2
+            text: "Grande Echelle"
             font_size: '64sp'
             color: (0, 0, 0, 1)
+        BoxLayout: # une boite pour espacer
+            orientation: 'vertical'
+            size_hint_y: 0.1
 
         BoxLayout: # Affichage de ce qui est envoyé en OSC
             orientation: 'vertical'
@@ -29,10 +31,17 @@
                     font_size: '24sp'
                     color: (1, 1, 1, 1)
                 Label:  # valeur depth
+                    id: depth_text
                     text: str(root.depth)
                     font_size: '36sp'
                     color: (1, 1, 1, 1)
+                Label:  # plage
+                    id: plage_text
+                    text: 'Nombre de frame du film:  ' + str(root.plage)
+                    font_size: '24sp'
+                    color: (1, 1, 1, 1)
                 Label:  # ip port
+                    id: adress_text
                     text: 'Adresse:  ' + root.ip + ' / ' + str(root.port)
                     font_size: '24sp'
                     color: (1, 1, 1, 1)
